@@ -1,10 +1,20 @@
-const express = require('express')
+const express = require('express');
+
 const app = express()
+const router = express.Router();
 
-app.use(()=>{
-  console.log('ikiserver');
-  
+const comments= [{name: "fazufi", email:"fazufi10@gmail.com", body:"semua", "id": 1}, {name: "izul", email:"izul@gmail.com", body:"izul", "id": 2}, {name: "setren", email:"setren@gmail.com", body:"setren", "id": 3}]
+const products= [{name: "sepatu", price:"2000", body:"satu", "id": 1}, {name: "sandal", price:"3000", body:"dua", "id": 2}, {name: "tas", price:"5000", body:"tiga", "id": 3}]
+
+router.use('/comments', (req, res, next)=>{  
+  res.json(comments)
+  next()
 })
-app.listen(4000);
 
-console.log("jsdkljfsdklfjs");
+router.use('/products', (req, res, next)=>{  
+  res.json(products)
+  next()
+})
+
+app.use('/', router);
+app.listen(4000);
