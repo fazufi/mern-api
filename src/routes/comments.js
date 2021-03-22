@@ -6,5 +6,6 @@ const commentsController= require('../controllers/comments')
 
 router.post('/comments', commentsController.createComments)
 router.get('/comments', commentsController.getComments)
+router.delete('/comments/:id', commentsController.deleteComments)
 
 module.exports= router
