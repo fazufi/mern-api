@@ -1,14 +1,1 @@
-[
-  {
-    "name": "Satu",
-    "email": "samiri@gmail.com",
-    "body": "Assalamualaikum",
-    "id": 1
-  },
-  {
-    "name": "dua",
-    "email": "",
-    "body": ""
-  }
-  
-]
+[{"name":"satu","email":"satu@gmail.com","body":"satu","id":1},{"name":"tiga","email":"tiga@gmail.com","body":"tiga","id":3},{"name":"22dua","email":"dua@gmail","body":"dua","id":4}]
