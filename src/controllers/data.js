@@ -1,8 +1,10 @@
+const createError = require('http-errors');
 const fs = require("fs-extra");
 const path = require("path");
+
 let db = require("../db/db.json");
 
-exports.createData = (req, res, next) => {
+exports.createData = async (req, res, next) => {
   const endpoint = req.params.data;
   const data = db.data[endpoint];
   const config = req.body;
@@ -12,36 +14,48 @@ exports.createData = (req, res, next) => {
   });
   const c = sorted[sorted.length - 1] ? sorted[sorted.length - 1].id + 1 : 1;
   data.push({ ...config, id: c });
-  fs.writeJson(path.join(__dirname, "../db/db.json"), db);
+  await fs.writeJson(path.join(__dirname, "../db/db.json"), db);
   res.json(data);
 };
 
-exports.getData = (req, res, next) => {
+exports.readData = (req, res, next) => {
   const endpoint = req.params.data;
   const data = db.data[endpoint];
   res.send(data);
 };
 
-exports.deleteData = (req, res, next) => {
+
+exports.updateData = async (req, res, next) => {
+  const endpoint = req.params.data;
+  const data = db.data[endpoint];
+  const config = req.body;
+  const index = data.findIndex((v) => v.id == req.params.id);
+  console.log("index", index);
+  if (index > -1) {
+    data[index] = { ...data[index], ...config };
+    // Data[index] = Object.assign(Data[index], data)
+   await fs.writeJson(path.join(__dirname, "../db/db.json"), db);
+    res.json("successful");
+  }
+  else {
+    const err = createError(410, "Data tidak ditemukan!");
+    res.status(err.status).json(err.message);
+  }
+};
+
+exports.deleteData = async (req, res, next) => {
   const endpoint = req.params.data;
   const data = db.data[endpoint];
   const index = data.findIndex((v) => v.id == req.params.id);
   if (index > -1) {
     data.splice(index, 1);
-    fs.writeJson(path.join(__dirname, "../db/db.json"), db);
+  await  fs.writeJson(path.join(__dirname, "../db/db.json"), db);
     res.json("successful");
+  }
+  else {
+    const err = createError(410, "Data tidak ditemukan!");
+    res.status(err.status).json(err.message);
   }
 };
 
-exports.editData = async (req, res, next) => {
-  const endpoint = req.params.data;
-  const data = db.data[endpoint];
-  const config = req.body;
-  const index = data.findIndex((v) => v.id == req.params.id);
-  if (index > -1) {
-    data[index] = { ...data[index], ...config };
-    // Data[index] = Object.assign(Data[index], data)
-    fs.writeJson(path.join(__dirname, "../db/db.json"), db);
-    res.json("successful");
-  }
-};
+
