@@ -1,16 +1,19 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-const { checkAuth } = require('../helpers')
-const dataController= require('../controllers/data')
+const { checkAuth } = require("../helpers");
+const dataController = require("../controllers/data");
+
+table = ["/:table", "/:table/:id"];
+
+router.post('/:table', checkAuth, dataController.postData)
+
+router.get(table, checkAuth, dataController.getData);
 
 
 
-router.post('/:data', checkAuth, dataController.createData)
-router.get('/:data', checkAuth, dataController.readData)
-router.put('/:data/:id', checkAuth, dataController.updateData)
+
+// router.put('/:data/:id/:a', checkAuth, dataController.updateData)
 router.delete('/:data/:id', checkAuth, dataController.deleteData)
 
-
-
-module.exports= router
+module.exports = router;
