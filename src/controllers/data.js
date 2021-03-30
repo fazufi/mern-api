@@ -1,16 +1,27 @@
-const createError = require("http-errors");
 const fs = require("fs-extra");
 const path = require("path");
 
 const db = require("../db/db.json");
 const filePath = path.join(__dirname, "../db/db.json");
 
-exports.postData =  (req, res) => {
+exports.postData = (req, res) => {
   let body = db[req.params.table];
+  const sorted =
+    body &&
+    body.sort((a, b) => {
+      console.log(a.id, b.id, a.id - b.id);
+      return a.id - b.id;
+    });
+  const c = sorted
+    ? sorted[sorted.length - 1]
+      ? sorted[sorted.length - 1].id + 1
+      : null
+    : 1;
+
   if (body) {
-    body.push(req.body);
+    body.push({ ...req.body, id: c });
   } else {
-    body = [req.body];
+    body = [{ ...req.body, id: c }];
   }
   console.log("body", body);
   const data = Object.assign(db, { [req.params.table]: body });
@@ -18,80 +29,53 @@ exports.postData =  (req, res) => {
   res.json(data);
 };
 
-
-
-
-//   const endpoint = req.params.table;
-//   const data = db[endpoint];
-//   const config = req.body;
-//   const sorted = data.sort((a, b) => {
-//     console.log(a.id, b.id, a.id - b.id);
-//     return a.id - b.id;
-//   });
-//   const c = sorted[sorted.length - 1] ? sorted[sorted.length - 1].id + 1 : 1;
-//   data.push({ ...config, id: c });
-//   await fs.writeJson(filePath, db);
-//   res.json(data);
-// };
-
-
 exports.getData = (req, res) => {
-  const rpId = req.params.id
-  const rpTable = req.params.table
-  let table = db[rpTable];
-  const index = table && table.findIndex((v) => v.id == rpId);
+  const rpId = req.params.id;
+  const rpTable = req.params.table;
+  let vTable = db[rpTable];
+  const index = vTable && vTable.findIndex((v) => v.id == rpId);
 
-  table == undefined
+  vTable == undefined
     ? res.status(500).send(rpTable + " NOT FOUND!!!")
     : rpId
-    ? table[index] == undefined
+    ? vTable[index] == undefined
       ? res.status(500).send("id " + rpId + " NOT FOUND!!!")
       : null
     : null;
-  res.json(req.params.id ? table[index] : table);
+  res.json(rpId ? vTable[index] : vTable);
 };
 
-exports.updateData = async (req, res, next) => {
-  const endpoint = req.params.data;
-  const data = db.data[endpoint];
+exports.putData = async (req, res, next) => {
+  const rpTable = req.params.table;
+  const rpId = req.params.id;
+  const vTable = db[rpTable];
   const config = req.body;
-  req.query;
-  const index = data.findIndex((v) => v.id == req.params.id);
+  const index = vTable && vTable.findIndex((v) => v.id == rpId);
   console.log("index", index);
   if (index > -1) {
-    data[index] = { ...data[index], ...config };
-    // Data[index] = Object.assign(Data[index], data)
+    // vTable[index] = { ...vTable[index], ...config };
+    vTable[index] = Object.assign(vTable[index], config);
     await fs.writeJson(filePath, db);
-    res.json("successful");
+    res.json(vTable);
   } else {
-    const err = createError(410, "Data tidak ditemukan!");
-    res.status(err.status).json(err.message);
+    vTable == undefined
+      ? res.status(500).send(rpTable + " NOT FOUND!!!")
+      : res.status(500).send("id " + rpId + " NOT FOUND!!!");
   }
 };
 
 exports.deleteData = async (req, res, next) => {
-  const payload = db[req.params.table];
-  const index = payload.findIndex((v) => v.id == req.params.id);
+  const rpTable = req.params.table;
+  let vTable = db[rpTable];
+  const index = vTable && vTable.findIndex((v) => v.id == req.params.id);
   if (index > -1) {
-    payload.splice(index, 1);
-    const data = Object.assign(db, { [req.params.table]: payload });
+    vTable.splice(index, 1);
+    const data = Object.assign(db, { [rpTable]: vTable });
     fs.writeJson(filePath, db);
     res.json(data);
+  } else {
+    vTable == undefined
+      ? res.status(500).send(rpTable + " NOT FOUND!!!")
+      : res.status(500).send("id " + req.params.id + " NOT FOUND!!!");
   }
 };
-
-
-
-
-//   const endpoint = req.params.data;
-//   const data = db.data[endpoint];
-//   const index = data.findIndex((v) => v.id == req.params.id);
-//   if (index > -1) {
-//     data.splice(index, 1);
-//     await fs.writeJson(filePath, db);
-//     res.json("successful");
-//   } else {
-//     const err = createError(410, "Data tidak ditemukan!");
-//     res.status(err.status).json(err.message);
-//   }
-// };

@@ -4,16 +4,11 @@ const router = express.Router();
 const { checkAuth } = require("../helpers");
 const dataController = require("../controllers/data");
 
-table = ["/:table", "/:table/:id"];
+const table = ["/:table", "/:table/:id"];
 
-router.post('/:table', checkAuth, dataController.postData)
-
+router.post("/:table", checkAuth, dataController.postData);
 router.get(table, checkAuth, dataController.getData);
-
-
-
-
-// router.put('/:data/:id/:a', checkAuth, dataController.updateData)
-router.delete('/:data/:id', checkAuth, dataController.deleteData)
+router.put("/:table/:id", checkAuth, dataController.putData);
+router.delete("/:table/:id", checkAuth, dataController.deleteData);
 
 module.exports = router;
