@@ -35,14 +35,16 @@ exports.getData = (req, res) => {
   let vTable = db[rpTable];
   const index = vTable && vTable.findIndex((v) => v.id == rpId);
 
-  vTable == undefined
-    ? res.status(500).send(rpTable + " NOT FOUND!!!")
-    : rpId
-    ? vTable[index] == undefined
-      ? res.status(500).send("id " + rpId + " NOT FOUND!!!")
-      : null
-    : null;
-  res.json(rpId ? vTable[index] : vTable);
+  rpTable
+    ? vTable == undefined
+      ? res.status(500).send(rpTable + " NOT FOUND!!!")
+      : rpId
+      ? vTable[index] == undefined
+        ? res.status(500).send("id " + rpId + " NOT FOUND!!!")
+        : res.json(vTable[index])
+      : res.json(vTable)
+    : res.json(db);
+
 };
 
 exports.putData = async (req, res, next) => {
