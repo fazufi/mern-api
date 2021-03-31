@@ -2,7 +2,12 @@ const fs = require("fs-extra");
 const path = require("path");
 
 const db = require("../db/db.json");
+// const html = require("./homePage.html"  )
+// const home = require("./homePage")
 const filePath = path.join(__dirname, "../db/db.json");
+
+// let home;
+// let home = '<p>MERN SERVER</p><li><a href="/:table">req</a>'
 
 exports.postData = (req, res) => {
   let body = db[req.params.table];
@@ -34,6 +39,20 @@ exports.getData = (req, res) => {
   const rpTable = req.params.table;
   let vTable = db[rpTable];
   const index = vTable && vTable.findIndex((v) => v.id == rpId);
+  // console.log("vtable", db.keys);
+  //   for (const [key] of Object.entries(db)) {
+  //   home='<p>MERN SERVER</p><li><a href=' + key  +'>'+ key+'</a></li>';
+  // console.log("key", key);}
+
+  //   Object.keys(db).forEach((value, index, array)=>{
+  //      txt= `<p>MERN SERVER</p><li><a href='${value}'>${value}</a></li>`;
+  //      console.log("key", txt);
+  //   }
+  // )
+
+  const x = Object.keys(db).map((item, i) => {
+    return `<li><a href='${item}'>${item}</a></li>`;
+  });
 
   rpTable
     ? vTable == undefined
@@ -43,8 +62,9 @@ exports.getData = (req, res) => {
         ? res.status(500).send("id " + rpId + " NOT FOUND!!!")
         : res.json(vTable[index])
       : res.json(vTable)
-    : res.json(db);
-
+    : x > 1
+    ? res.status(500).send("DATA is EMPTY!!!")
+    : res.send(x.toString());
 };
 
 exports.putData = async (req, res, next) => {
